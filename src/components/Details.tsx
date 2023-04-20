@@ -19,10 +19,10 @@ export default function Details({
 			<div className={` ${className}`}>
 				<p className="text-base md:text-xl font-bold mb-4">{title}</p>
 				<p className="text-sm md:text-lg text-gray">Meaning</p>
-				<ul className="list-disc p-6 list-style">
+				<ul className="list-disc p-6 list-style ">
 					{data.map((p, i) => (
 						<li key={i + 1}>
-							<p className="text-sm md:text-lg text-dimBlack">{p.definition}</p>
+							<p className="text-sm md:text-lg">{p.definition}</p>
 						</li>
 					))}
 				</ul>

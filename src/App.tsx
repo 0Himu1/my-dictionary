@@ -3,6 +3,7 @@ import { FiExternalLink } from 'react-icons/fi';
 import Nav from './components/Nav';
 import Details from './components/Details';
 import { FormEvent, MouseEvent, useEffect, useState } from 'react';
+import Audio from './components/Audio';
 
 type data = {
 	word: string;
@@ -22,22 +23,26 @@ type data = {
 	sourceUrls: string[];
 }[];
 
-const damidata = [
-	'Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa quaerat id a harum laudantium corrupti magnam aut consequuntur optio magni?',
-	'Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa quaerat id a harum laudantium corrupti magnam aut consequuntur optio magni?',
-	'Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa quaerat id a harum laudantium corrupti magnam aut consequuntur optio magni?',
-];
-
 export default function App() {
-	const [keyword, setKeyword] = useState<string>('keyword');
+	const [keyword, setKeyword] = useState<string>('Happy');
 	const [data, setData] = useState<data>([]);
 	const [url, setUrl] = useState('');
+	const [darkMode, setDarkMode] = useState(false);
+	const [font, setFont] = useState('font-merriweather');
 
 	const fetchData = async (searchUrl: string) => {
 		const res = await fetch(searchUrl);
 		const json: data = await res.json();
 		setData(json);
 	};
+
+	useEffect(() => {
+		if (darkMode) {
+			document.documentElement.classList.add('dark');
+		} else {
+			document.documentElement.classList.remove('dark');
+		}
+	}, [darkMode]);
 
 	useEffect(() => {
 		setUrl(
@@ -63,17 +68,25 @@ export default function App() {
 	const phonetic = data[0]?.phonetics.filter(o => o.text && o.audio)[0];
 
 	return (
-		<main className="p-6 md:p-10 lg:px-52 font-merriweather text-dimBlack">
-			<Nav className="mb-6 md:mb-14" />
-			<div className="mb-6 md:mb-12">
+		<main
+			className={`min-h-screen p-6 md:p-10 lg:px-52 ${font} text-dimBlack dark:text-dimWhite dark:bg-dimBlack`}
+		>
+			<Nav
+				darkMode={darkMode}
+				setDarkMode={setDarkMode}
+				className="mb-6 md:mb-14"
+				setFont={setFont}
+				font={font}
+			/>
+			<div className="mb-6 md:mb-12 bg-[#f4f4f4] rounded-md">
 				<form
 					action=""
-					className="flex items-center w-full bg-[#f4f4f4] rounded-lg"
+					className="flex items-center w-full bg-dimWhitext-dimWhite dark:bg-[#1f1f1f] rounded-lg"
 					onSubmit={e => handleSubmit(e)}
 				>
 					<input
 						type="text"
-						className="w-full font-merriweathe md:text-xl font-bold px-6 py-4 md: md:py-5 bg-transparent outline-none"
+						className="w-full font-merriweathe dark:text-dimWhite md:text-xl font-bold px-6 py-4 md: md:py-5 bg-transparent outline-none"
 						value={keyword}
 						onChange={e => setKeyword(e.target.value)}
 					/>
@@ -91,18 +104,19 @@ export default function App() {
 						</h1>
 						<p className="text-primary text-lg md:text-2xl">{phonetic?.text}</p>
 					</div>
-					<div className="flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-primary/25 rounded-full cursor-pointer">
-						<BsFillPlayFill className="text-primary text-2xl md:text-3xl" />
-					</div>
+					{data[0]?.phonetics[0]?.audio && (
+						<Audio src={data[0]?.phonetics[0]?.audio} />
+					)}
 				</div>
 			)}
 
-			{data[0]?.meanings.map(o => (
+			{data[0]?.meanings.map((o, i) => (
 				<Details
 					data={o.definitions}
 					title={o.partOfSpeech}
 					className=""
 					synonyms={o.synonyms.length > 0 ? o.synonyms : null}
+					key={(i + 1)}
 				/>
 			))}
 
@@ -110,9 +124,7 @@ export default function App() {
 				<div className="flex items-center text-sm md:text-lg">
 					<p className="text-sm text-gray ">Source:</p>
 					<a href="#" target="_blank" className="flex">
-						<p className="text-dimBlack ml-4 underline">
-							{data[0]?.sourceUrls[0]}
-						</p>
+						<p className="ml-4 underline">{data[0]?.sourceUrls[0]}</p>
 						<FiExternalLink className="ml-2" />
 					</a>
 				</div>
